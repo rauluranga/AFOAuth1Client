@@ -116,7 +116,7 @@ static inline NSString * NSStringFromAFOAuthSignatureMethod(AFOAuthSignatureMeth
 
 static inline NSString * AFHMACSHA1Signature(NSURLRequest *request, NSString *consumerSecret, NSString *tokenSecret, NSStringEncoding stringEncoding) {
     NSString *secret = tokenSecret ? tokenSecret : @"";
-    NSString *secretString = [NSString stringWithFormat:@"%@&%@", consumerSecret, secret];
+    NSString *secretString = [NSString stringWithFormat:@"%@&%@", AFPercentEscapedQueryStringPairMemberFromStringWithEncoding(consumerSecret, stringEncoding), AFPercentEscapedQueryStringPairMemberFromStringWithEncoding(secret, stringEncoding)];
     NSData *secretStringData = [secretString dataUsingEncoding:stringEncoding];
 
     NSString *queryString = AFPercentEscapedQueryStringPairMemberFromStringWithEncoding([[[[[request URL] query] componentsSeparatedByString:@"&"] sortedArrayUsingSelector:@selector(compare:)] componentsJoinedByString:@"&"], stringEncoding);
@@ -304,6 +304,7 @@ static inline NSString * AFHMACSHA1Signature(NSURLRequest *request, NSString *co
 
         NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
         [parameters setValue:requestToken.key forKey:@"oauth_token"];
+        [parameters setValue:scope forKey:@"scope"];
         NSMutableURLRequest *request = [super requestWithMethod:@"GET" path:userAuthorizationPath parameters:parameters];
         [request setHTTPShouldHandleCookies:NO];
 #if __IPHONE_OS_VERSION_MIN_REQUIRED
@@ -332,7 +333,6 @@ static inline NSString * AFHMACSHA1Signature(NSURLRequest *request, NSString *co
     }
 
     NSMutableURLRequest *request = [self requestWithMethod:accessMethod path:path parameters:parameters];
-    [request setHTTPBody:nil];
 
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (success) {
