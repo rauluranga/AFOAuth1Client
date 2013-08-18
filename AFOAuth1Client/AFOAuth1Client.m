@@ -304,6 +304,7 @@ static inline NSString * AFHMACSHA1Signature(NSURLRequest *request, NSString *co
 
         NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
         [parameters setValue:requestToken.key forKey:@"oauth_token"];
+        [parameters setValue:scope forKey:@"scope"];
         NSMutableURLRequest *request = [super requestWithMethod:@"GET" path:userAuthorizationPath parameters:parameters];
         [request setHTTPShouldHandleCookies:NO];
 #if __IPHONE_OS_VERSION_MIN_REQUIRED
